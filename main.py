@@ -5,7 +5,7 @@ import matplotlib.transforms as transforms
 
 
 def visualize_neural_network(num_layers, neurons_per_layer, weights, biases, activations, display_weights=False,
-                             display_biases=False, color_stroke_weights=True):
+                             display_biases=False, color_stroke_weights=True, display_activations=False):
     fig, ax = plt.subplots(figsize=(16, 9), dpi=300)
     ax.axis('off')
 
@@ -78,7 +78,7 @@ def visualize_neural_network(num_layers, neurons_per_layer, weights, biases, act
             ax.scatter(x_position, y, s=neuron_size, edgecolor="k", facecolor="black", zorder=3)  # Set zorder to 3
 
             # Draw activation values
-            if activations and layer < len(activations):
+            if activations and layer < len(activations) and display_activations:
                 activation = activations[layer][neuron_idx]
                 plt.text(x_position, y, f'{activation:.2f}', fontsize=8, ha='center', va='center', color='white')
 
@@ -90,9 +90,41 @@ def visualize_neural_network(num_layers, neurons_per_layer, weights, biases, act
     plt.show()
 
 
+# make an image representing the weights going into a single neuron
+def visualize_single_neuron_weights(weights, shape, min=None, max=None):
+    fig, ax = plt.subplots(figsize=(16, 9), dpi=300)
+    ax.axis('off')
+    ax.aspect = 'equal'
+
+
+    in_format = np.reshape(weights, shape)
+
+    if min is None:
+        min = np.min(in_format)
+    if max is None:
+        max = np.max(in_format)
+
+    if len(shape) > 2:
+        print("Please provide a 1D or 2D array.")
+
+
+    for i in in_format:
+        if(len(in_format) == 1):
+            ax.imshow(np.array([i]), cmap='coolwarm', vmin=min, vmax=max)
+        else:
+            ax.imshow(in_format, cmap='coolwarm', vmin=min, vmax=max)
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
 # Example usage:
 num_layers = 4
-neurons_per_layer = [784, 64, 64, 26]
+neurons_per_layer = [784, 12, 12, 26]
 weights = [
     np.random.uniform(-1, 1, (neurons_per_layer[i + 1], neurons_per_layer[i])) for i in range(num_layers - 1)
 ]
@@ -104,3 +136,4 @@ activations = [
 ]
 
 visualize_neural_network(num_layers, neurons_per_layer, weights, biases, activations, color_stroke_weights=True)
+visualize_single_neuron_weights(weights[0][1], (28, 28))
